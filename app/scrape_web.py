@@ -58,6 +58,9 @@ def html_cleansing(source: str, work_dir: str):
     )
     ql_editor_tag = container.find("div", {"class": "ql-editor"})
 
+    for tag in ql_editor_tag.find_all(["br"]):
+        tag.replace_with("<br>\n")
+
     for tag in ql_editor_tag.find_all(["p", re.compile("h\d+")]):
         text = tag.get_text()
         tag.replace_with(text)
@@ -75,6 +78,8 @@ def html_cleansing(source: str, work_dir: str):
     composed_sub = reduce(
         lambda f, g: lambda x: f(g(x)),
         [
+            partial(re.compile("\n{3,}").sub, "\n\n"),
+            partial(re.compile("<br>").sub, ""),
             partial(re.compile("\n+").sub, "\n"),
             partial(re.compile("[ \t]+").sub, ""),
         ],
